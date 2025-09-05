@@ -1,0 +1,130 @@
+{% extends 'dispositivos/base.html' %}
+
+{% block title %}Dashboard - Gestor de Ativos de TI{% endblock %}
+
+{% block styles %}
+<style>
+    .dashboard-grid {
+        display: flex;
+        gap: 30px;
+        align-items: flex-start;
+    }
+    .left-sidebar {
+        width: 380px;
+        flex-shrink: 0;
+        position: sticky; /* Agora vai funcionar corretamente! */
+        top: 20px;       /* Ele vai "grudar" em relação ao <main>, que é o que rola */
+    }
+    .main-panel {
+        flex-grow: 1;
+    }
+    .card {
+        height: 200px;
+
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="dashboard-grid">
+    <aside class="left-sidebar">
+        <h2 class="mb-4">DashBoard</h2>
+        
+        <div class="card">
+            <div class="plotly-graph-container">
+                {% if plotly_graph_ativos %}
+                    {{ plotly_graph_ativos|safe }}
+                {% else %}
+                    <div class="alert alert-info p-5">Sem dados de computadores.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="plotly-graph-container">
+                {% if plotly_graph_manutencao %}
+                    {{ plotly_graph_manutencao|safe }}
+                {% else %}
+                    <div class="alert alert-info p-5">Sem dados de manutenção.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <h5>Próximas Manutenções</h5>
+            <ul class="list-group list-group-flush">
+                {% for plano in proximas_manutencoes %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ plano.dispositivos.nome_descritivo|truncatechars:25 }}
+                    <span class="badge bg-primary rounded-pill">{{ plano.data_manu|date:"d/m/y" }}</span>
+                </li>
+                {% empty %}
+                <li class="list-group-item">Nenhuma manutenção agendada.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </aside>
+
+    <section class="main-panel">
+        {% for item in lista_computadores_painel %}
+        <div class="card">
+            <h6>{{ item.computador.nome }} - Setor: {{ item.computador.setor.nome }}</h6>
+            {% if item.status %}
+                <div class="mt-2">
+                    <label class="form-label small">CPU: {{ item.status.cpu_percent|floatformat:1 }}%</label>
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar" role="progressbar" style="width: {{ item.status.cpu_percent }}%;" ></div>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <label class="form-label small">Memória: {{ item.status.memory_percent|floatformat:1 }}%</label>
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ item.status.memory_percent }}%;" ></div>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <label class="form-label small">Disco: {{ item.status.disk_percent|floatformat:1 }}%</label>
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: {{ item.status.disk_percent }}%;" ></div>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-muted small mt-2">Nenhum dado de monitoramento recebido.</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </section>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const centerTextPlugin = {id: 'centerText',afterDraw: (chart) => {if (chart.config.options.plugins.centerText && chart.config.options.plugins.centerText.display) {let ctx = chart.ctx;ctx.save();let centerX = (chart.chartArea.left + chart.chartArea.right) / 2;let centerY = (chart.chartArea.top + chart.chartArea.bottom) / 2;ctx.font = 'bold 30px sans-serif';ctx.fillStyle = chart.config.options.plugins.centerText.color || '#000';ctx.textAlign = 'center';ctx.textBaseline = 'middle';ctx.fillText(chart.config.options.plugins.centerText.text, centerX, centerY);ctx.restore();}}};
+        Chart.register(centerTextPlugin);
+        const ctxAtivos = document.getElementById('chartAtivos');
+        if (ctxAtivos) {
+            const computadoresAtivos = {{ computadores_ativos|default:0 }};
+            const totalComputadores = {{ total_computadores|default:0 }};
+            const computadoresInativos = Math.max(0, totalComputadores - computadoresAtivos);
+            new Chart(ctxAtivos, { type: 'doughnut', data: { labels: ['Ativos', 'Inativos'], datasets: [{ data: [computadoresAtivos, computadoresInativos], backgroundColor: ['#36A2EB', '#FF6384'], }] }, options: { responsive: true, plugins: { legend: { position: 'top' }, centerText: { display: true, text: computadoresAtivos, color: '#36A2EB' } } } });
+        }
+        const ctxManutencao = document.getElementById('chartManutencao');
+        if (ctxManutencao) {
+            const emManutencao = {{ dispositivos_em_manutencao|default:0 }};
+            const totalAtivosParaManu = {{ computadores_ativos|default:0 }}; 
+            const ok = Math.max(0, totalAtivosParaManu - emManutencao);
+            new Chart(ctxManutencao, { type: 'doughnut', data: { labels: ['Em Manutenção', 'Operando OK'], datasets: [{ data: [emManutencao, ok], backgroundColor: ['#FFCD56', '#4BC0C0'], }] }, options: { responsive: true, plugins: { legend: { position: 'top' }, centerText: { display: true, text: emManutencao, color: '#FFCD56' } } } });
+        }
+    });
+</script>
+{% endblock %}

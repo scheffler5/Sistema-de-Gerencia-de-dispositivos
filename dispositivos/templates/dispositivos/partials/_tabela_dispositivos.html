@@ -1,0 +1,116 @@
+{% if tipo_filtro_ativo == 'computador' %}
+    <h5 class="card-title mb-3">Computadores</h5>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Nome do Host</th>
+                    <th>Setor</th>
+                    <th>Endereço IP</th>
+                    <th>Endereço MAC</th>
+                    <th>Modelo</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dispositivo in dispositivos %}
+                <tr>
+                    <td><strong>{{ dispositivo.nome }}</strong></td>
+                    <td>{{ dispositivo.setor.nome }}</td>
+                    <td><code>{{ dispositivo.ip_dispositivo }}</code></td>
+                    <td><code>{{ dispositivo.endereco_mac }}</code></td>
+                    <td>{{ dispositivo.modelo }}</td>
+                    <td class="text-center">
+                        {% if dispositivo.ativo %}
+                            <span class="badge bg-success-subtle text-success-emphasis">Ativo</span>
+                        {% else %}
+                            <span class="badge bg-danger-subtle text-danger-emphasis">Inativo</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <a href="{% url 'dispositivos:editar_dispositivo' tipo='computador' identificador=dispositivo.endereco_mac %}" class="btn btn-sm btn-outline-primary btn-icon-text">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center p-4">Nenhum computador cadastrado.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% elif tipo_filtro_ativo == 'servidor' %}
+    <h5 class="card-title mb-3">Servidores</h5>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr><th>Modelo</th><th>Marca</th><th>Setor</th><th>IP</th><th>Service Tag</th><th class="text-center">Status</th><th class="text-end">Ações</th></tr>
+            </thead>
+            <tbody>
+                {% for dispositivo in dispositivos %}
+                <tr>
+                    <td><strong>{{ dispositivo.modelo }}</strong></td>
+                    <td>{{ dispositivo.marca }}</td>
+                    <td>{{ dispositivo.setor.nome }}</td>
+                    <td><code>{{ dispositivo.ip_dispositivo }}</code></td>
+                    <td><code>{{ dispositivo.service_tag }}</code></td>
+                    <td class="text-center">
+                        {% if dispositivo.ativo %}
+                            <span class="badge bg-success-subtle text-success-emphasis">Ativo</span>
+                        {% else %}
+                            <span class="badge bg-danger-subtle text-danger-emphasis">Inativo</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end"><a href="{% url 'dispositivos:editar_dispositivo' tipo='servidor' identificador=dispositivo.service_tag %}" class="btn btn-sm btn-outline-primary btn-icon-text"><i class="bi bi-pencil"></i> Editar</a></td>
+                </tr>
+                {% empty %}<tr><td colspan="7" class="text-center p-4">Nenhum servidor cadastrado.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% elif tipo_filtro_ativo == 'roteador' %}
+     <h5 class="card-title mb-3">Roteadores</h5>
+     <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr><th>Modelo</th><th>Marca</th><th>Setor</th><th>IP</th><th>MAC</th><th class="text-end">Ações</th></tr>
+            </thead>
+            <tbody>
+                {% for dispositivo in dispositivos %}
+                <tr>
+                    <td><strong>{{ dispositivo.modelo }}</strong></td>
+                    <td>{{ dispositivo.marca }}</td>
+                    <td>{{ dispositivo.setor.nome }}</td>
+                    <td><code>{{ dispositivo.ip_dispositivo }}</code></td>
+                    <td><code>{{ dispositivo.endereco_mac }}</code></td>
+                    <td class="text-end"><a href="{% url 'dispositivos:editar_dispositivo' tipo='roteador' identificador=dispositivo.endereco_mac %}" class="btn btn-sm btn-outline-primary btn-icon-text"><i class="bi bi-pencil"></i> Editar</a></td>
+                </tr>
+                {% empty %}<tr><td colspan="6" class="text-center p-4">Nenhum roteador cadastrado.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% elif tipo_filtro_ativo == 'impressora' %}
+    <h5 class="card-title mb-3">Impressoras</h5>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr><th>Nome</th><th>Setor</th><th>IP</th><th>Serial</th><th>Modelo</th><th class="text-end">Ações</th></tr>
+            </thead>
+            <tbody>
+                {% for dispositivo in dispositivos %}
+                <tr>
+                    <td><strong>{{ dispositivo.nome_impressora }}</strong></td>
+                    <td>{{ dispositivo.setor.nome }}</td>
+                    <td><code>{{ dispositivo.ip_dispositivo|default:"N/A" }}</code></td>
+                    <td><code>{{ dispositivo.serial }}</code></td>
+                    <td>{{ dispositivo.modelo }}</td>
+                    <td class="text-end"><a href="{% url 'dispositivos:editar_dispositivo' tipo='impressora' identificador=dispositivo.serial %}" class="btn btn-sm btn-outline-primary btn-icon-text"><i class="bi bi-pencil"></i> Editar</a></td>
+                </tr>
+                {% empty %}<tr><td colspan="6" class="text-center p-4">Nenhuma impressora cadastrada.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}

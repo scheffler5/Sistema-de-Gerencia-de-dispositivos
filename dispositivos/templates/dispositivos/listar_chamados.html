@@ -1,0 +1,46 @@
+{% extends 'dispositivos/base.html' %}
+{% block title %}Chamados{% endblock %}
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Chamados</h1>
+        <div>
+            <a href="{% url 'dispositivos:cadastrar_chamado' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle-fill"></i> Cadastrar Chamado
+            </a>
+        </div>
+    </div>
+    <div class="card p-4">
+        <h5 class="card-title mb-3">Últimos Chamados Registrados</h5>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover table-sm">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Dispositivo</th>
+                        <th>Setor</th>
+                        <th>Abertura</th>
+                        <th>Duração</th>
+                        <th>Ações</th> </tr>
+                </thead>
+                <tbody>
+                    {% for chamado in lista_de_chamados %}
+                    <tr>
+                        <td>{{ chamado.titulo }}</td>
+                        <td>{{ chamado.dispositivos.nome_descritivo }}</td>
+                        <td>{{ chamado.setores.nome }}</td>
+                        <td>{{ chamado.data_chamado|date:"d/m/Y H:i" }}</td>
+                        <td>{{ chamado.duracao|default:"Em aberto" }}</td>
+                        <td>
+                            <a href="{% url 'dispositivos:editar_chamado' pk=chamado.pk %}" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-pencil-fill"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center">Nenhum chamado cadastrado.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

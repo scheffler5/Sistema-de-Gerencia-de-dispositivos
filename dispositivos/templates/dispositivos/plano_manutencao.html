@@ -1,0 +1,134 @@
+{% extends 'dispositivos/base.html' %}
+
+{% block title %}Plano de Manutenção{% endblock %}
+
+{% block styles %}
+<style>
+    /* --- ESTILOS PARA UM CALENDÁRIO MODERNO --- */
+
+    /* Contêiner principal do calendário */
+    .fc {
+        border: none; /* Remove a borda principal feia */
+        font-family: system-ui, sans-serif;
+    }
+
+    /* Cabeçalho (Mês/Ano) */
+    .fc .fc-toolbar-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    /* Botões de navegação (hoje, mês, semana) */
+    .fc .fc-button-primary {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        font-weight: 500;
+        transition: all 0.2s ease-in-out;
+    }
+    .fc .fc-button-primary:hover {
+        background-color: #0b5ed7;
+        border-color: #0a58ca;
+    }
+    .fc .fc-button-primary:focus {
+        box-shadow: 0 0 0 0.25rem rgba(49,132,253,.5);
+    }
+
+    /* Dias da semana (dom, seg, ter) */
+    .fc .fc-col-header-cell-cushion {
+        text-decoration: none;
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    /* Célula de cada dia */
+    .fc .fc-daygrid-day {
+        border: 1px solid #e9ecef; /* Borda bem mais suave */
+        padding: 4px;
+    }
+
+    /* Número de cada dia */
+    .fc .fc-daygrid-day-number {
+        text-decoration: none;
+        color: #212529;
+    }
+    
+    /* Dia de hoje */
+    .fc .fc-day-today {
+        background-color: #eef5ff !important;
+    }
+
+    /* Estilo dos eventos no calendário */
+    .fc-event {
+        border: none !important;
+        border-left: 4px solid var(--fc-event-border-color, #0d6efd) !important;
+        padding: 5px 8px !important;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+    .fc-event:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .fc-event .fc-event-title {
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Plano de Manutenção</h1>
+        <div>
+            <a href="{% url 'dispositivos:cadastrar_plano' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle-fill"></i> Cadastrar Plano
+            </a>
+        </div>
+    </div>
+
+    <div class="card p-4">
+        <div id="calendario"></div>
+    </div>
+{% endblock %}
+
+
+{% block scripts %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.14/index.global.min.js'></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendario');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            // Não precisamos mais do themeSystem, pois nosso CSS customizado é mais forte
+            initialView: 'dayGridMonth',
+            locale: 'pt-br',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,listWeek'
+            },
+            events: "{% url 'dispositivos:api_planos_calendario' %}",
+            height: 750, // Altura fixa para um visual mais robusto
+            navLinks: true,
+            editable: false,
+            dayMaxEvents: true,
+            eventClick: function(info) {
+                // 'info.event.id' contém o ID (pk) do plano de manutenção que enviamos da nossa API
+                const planoId = info.event.id;
+                
+                // Construímos a URL de edição que já criamos em urls.py
+                const urlDeEdicao = `/app/planos/editar/${planoId}/`;
+                
+                // Redireciona o navegador para a página de edição do plano clicado
+                window.location.href = urlDeEdicao;
+            },
+
+            // Adicionamos um estilo visual para os eventos
+            eventDidMount: function(info) {
+                info.el.style.cursor = 'pointer';
+            }
+        });
+        calendar.render();
+    });
+</script>
+{% endblock %}

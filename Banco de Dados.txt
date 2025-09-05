@@ -1,0 +1,247 @@
+CREATE TABLE usuarios(
+	id SERIAL PRIMARY KEY,
+	nome VARCHAR(180) NOT NULL,
+	senha_hash VARCHAR(255) NOT NULL,
+	funcao VARCHAR(150) NOT NULL,
+	data_cadastro DATE DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE setores(
+	id SERIAL PRIMARY KEY,
+	nome VARCHAR(180) NOT NULL
+);
+
+CREATE TYPE tipo_armazenamento_enum AS ENUM ('SSD', 'HDD', 'NVMe', 'OUTRO');
+
+CREATE TABLE computadores(
+	id SERIAL PRIMARY KEY,
+	nome VARCHAR(250) NOT NULL,
+	modelo VARCHAR(200) NOT NULL,
+	endereco_mac VARCHAR(17) UNIQUE NOT NULL,
+	marca_processador VARCHAR(200) NOT NULL,
+	frequencia_processador NUMERIC(4, 2) NOT NULL,
+	velocidade_memoria INTEGER NOT NULL,
+	tamanho_memoria INTEGER NOT NULL,
+	tipo_armazenamento tipo_armazenamento_enum NOT NULL,
+	tamanho_armazenamento INTEGER NOT NULL,
+	versao_so VARCHAR(100) NOT NULL DEFAULT 'Windows 10 pro',
+	ativo BOOLEAN NOT NULL DEFAULT FALSE,
+	potencia_fonte INTEGER NOT NULL,
+	ip_dispositivo INET UNIQUE NOT NULL,
+	data_instalacao DATE NOT NULL,
+	setor_id INTEGER NOT NULL,
+	CONSTRAINT fk_computadores_setor
+        FOREIGN KEY (setor_id)
+        REFERENCES setores(id)
+);
+
+CREATE TYPE categorias_atend_enum AS ENUM ('Manutenção', 'Troca', 'Ajuste','Atualização');
+
+CREATE TABLE categorias_atend(
+	id SERIAL PRIMARY KEY,
+	nome categorias_atend_enum NOT NULL
+);
+
+CREATE TABLE hosts (
+	id SERIAL PRIMARY KEY,
+	nome_host VARCHAR(100) NOT NULL,
+	ip_host INET UNIQUE NOT NULL
+);
+
+CREATE TABLE servidores (
+	id SERIAL PRIMARY KEY,
+	modelo VARCHAR(200) NOT NULL,
+	marca VARCHAR(200) NOT NULL,
+	endereco_mac VARCHAR(17) UNIQUE NOT NULL,
+	marca_processador VARCHAR(200) NOT NULL,
+	frequencia_processador NUMERIC(4, 2) NOT NULL,
+	velocidade_memoria INTEGER NOT NULL,
+	tamanho_memoria INTEGER NOT NULL,
+	tipo_armazenamento tipo_armazenamento_enum NOT NULL,
+	tamanho_armazenamento INTEGER NOT NULL,
+	versao_so VARCHAR(100) NOT NULL DEFAULT 'Windows Server 2019',
+	ativo BOOLEAN NOT NULL DEFAULT FALSE,
+	express_code VARCHAR(100) NOT NULL,
+	service_tag VARCHAR(45) UNIQUE NOT NULL,
+	ip_dispositivo INET UNIQUE NOT NULL,
+	data_instalacao DATE NOT NULL,
+	setor_id INTEGER NOT NULL,
+	CONSTRAINT fk_servidores_setor
+        FOREIGN KEY (setor_id)
+        REFERENCES setores(id)
+);
+
+CREATE TABLE roteadores (
+	id SERIAL PRIMARY KEY,
+	marca VARCHAR(45) NOT NULL,
+	modelo VARCHAR(45) NOT NULL,
+	endereco_mac VARCHAR(17) UNIQUE NOT NULL,
+	ip_dispositivo INET UNIQUE NOT NULL,
+	data_instalacao DATE NOT NULL,
+	setor_id INTEGER NOT NULL,
+	CONSTRAINT fk_roteadores_setor
+        FOREIGN KEY (setor_id)
+        REFERENCES setores(id)
+);
+
+CREATE TYPE tipo_conexao_enum AS ENUM ('REDE','CABEADO','WIFI');
+
+CREATE TABLE impressoras(
+	id SERIAL PRIMARY KEY,
+	modelo VARCHAR(45) NOT NULL,
+	toner VARCHAR(45) NOT NULL,
+	nome_impressora VARCHAR(150) NOT NULL,
+	proprietario VARCHAR(100) NOT NULL DEFAULT 'Top Print',
+	serial VARCHAR(100) UNIQUE NOT NULL,
+	tipo_conexao tipo_conexao_enum NOT NULL,
+	ip_dispositivo INET UNIQUE,
+	setor_id INTEGER NOT NULL,
+	CONSTRAINT fk_impressoras_setor
+        FOREIGN KEY (setor_id)
+        REFERENCES setores(id)
+);
+
+CREATE TABLE dispositivos(
+	id SERIAL PRIMARY KEY,
+	computadores_id INTEGER UNIQUE,
+    roteadores_id INTEGER UNIQUE,
+    servidores_id INTEGER UNIQUE,
+    impressoras_id INTEGER UNIQUE,
+	CONSTRAINT fk_dispositivos_computadores
+        FOREIGN KEY (computadores_id)
+        REFERENCES computadores(id) ON DELETE CASCADE,
+    CONSTRAINT fk_dispositivos_roteadores
+        FOREIGN KEY (roteadores_id)
+        REFERENCES roteadores(id) ON DELETE CASCADE,
+    CONSTRAINT fk_dispositivos_servidores
+        FOREIGN KEY (servidores_id)
+        REFERENCES servidores(id) ON DELETE CASCADE,
+    CONSTRAINT fk_dispositivos_impressoras
+        FOREIGN KEY (impressoras_id)
+        REFERENCES impressoras(id) ON DELETE CASCADE,
+    CONSTRAINT um_equipamento_por_dispositivo
+        CHECK (
+            num_nonnulls(computadores_id, roteadores_id, impressoras_id, servidores_id) = 1
+        )
+);
+
+CREATE OR REPLACE FUNCTION insere_registro_dispositivo()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_TABLE_NAME = 'computadores' THEN
+        INSERT INTO dispositivos (computadores_id) VALUES (NEW.id);
+    ELSIF TG_TABLE_NAME = 'roteadores' THEN
+        INSERT INTO dispositivos (roteadores_id) VALUES (NEW.id);
+    ELSIF TG_TABLE_NAME = 'servidores' THEN
+        INSERT INTO dispositivos (servidores_id) VALUES (NEW.id);
+    ELSIF TG_TABLE_NAME = 'impressoras' THEN
+        INSERT INTO dispositivos (impressoras_id) VALUES (NEW.id);
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_computador_para_dispositivo
+AFTER INSERT ON computadores
+FOR EACH ROW
+EXECUTE FUNCTION insere_registro_dispositivo();
+
+CREATE TRIGGER trg_roteador_para_dispositivo
+AFTER INSERT ON roteadores
+FOR EACH ROW
+EXECUTE FUNCTION insere_registro_dispositivo();
+
+CREATE TRIGGER trg_servidor_para_dispositivo
+AFTER INSERT ON servidores
+FOR EACH ROW
+EXECUTE FUNCTION insere_registro_dispositivo();
+
+CREATE TRIGGER trg_impressora_para_dispositivo
+AFTER INSERT ON impressoras
+FOR EACH ROW
+EXECUTE FUNCTION insere_registro_dispositivo();
+
+CREATE TABLE chamados (
+	id SERIAL PRIMARY KEY,
+	setores_id INTEGER NOT NULL,
+	usuario_id INTEGER NOT NULL,
+	dispositivos_id INTEGER NOT NULL,
+	data_dia DATE DEFAULT CURRENT_DATE,
+	data_chamado TIMESTAMPTZ NOT NULL,
+	data_finalizacao TIMESTAMPTZ NOT NULL DEFAULT now(),
+	descricao_problema TEXT NOT NULL,
+	nivel_atendimento_cliente INTEGER NOT NULL,
+	CONSTRAINT fk_chamados_setores
+        FOREIGN KEY (setores_id)
+        REFERENCES setores(id),
+	CONSTRAINT fk_chamados_usuario
+        FOREIGN KEY (usuario_id)
+        REFERENCES usuarios(id),
+	CONSTRAINT fk_chamados_dispositivos
+        FOREIGN KEY (dispositivos_id)
+        REFERENCES dispositivos(id)
+);
+
+CREATE TABLE login_usuario_pc (
+	id SERIAL PRIMARY KEY,
+	nome_user VARCHAR(100) NOT NULL,
+	senha VARCHAR(100) NOT NULL,
+	computadores_id INTEGER NOT NULL,
+	CONSTRAINT fk_login_computadores
+        FOREIGN KEY (computadores_id)
+        REFERENCES computadores(id)
+);
+
+CREATE TABLE emails_antigos (
+	id SERIAL PRIMARY KEY,
+	nome_email VARCHAR(100) NOT NULL,
+	tamanho_email INTEGER NOT NULL,
+	senha VARCHAR(45) NOT NULL,
+	setores_id INTEGER,
+	CONSTRAINT fk_emailv_setores
+        FOREIGN KEY (setores_id)
+        REFERENCES setores(id)
+);
+
+CREATE TABLE emails_novos (
+	id SERIAL PRIMARY KEY,
+	nome_email VARCHAR(100) NOT NULL,
+	tamanho_email INTEGER NOT NULL,
+	senha VARCHAR(45) NOT NULL,
+	setores_id INTEGER,
+	CONSTRAINT fk_emailn_setores
+        FOREIGN KEY (setores_id)
+        REFERENCES setores(id)
+);
+
+CREATE TABLE pasta_publica (
+	id SERIAL PRIMARY KEY,
+	nome_user VARCHAR(100) NOT NULL,
+	senha VARCHAR(45) NOT NULL,
+	setores_id INTEGER,
+	CONSTRAINT fk_pasta_setores
+        FOREIGN KEY (setores_id)
+        REFERENCES setores(id)
+);
+
+CREATE TYPE situacao_enum AS ENUM ('FEITO','NAO FEITO','ATRASADO');
+
+CREATE TABLE plano_manu_prevent (
+	id SERIAL PRIMARY KEY,
+	data_manu DATE NOT NULL,
+	descricao TEXT NOT NULL,
+	situacao situacao_enum NOT NULL,
+	dispositivos_id INTEGER NOT NULL,
+	CONSTRAINT fk_plano_dispositivos
+        FOREIGN KEY (dispositivos_id)
+        REFERENCES dispositivos(id)
+);
+
+CREATE TABLE treinamentos (
+	id SERIAL PRIMARY KEY,
+	setor_id INTEGER NOT NULL,
+	descricao TEXT NOT NULL,
+	data_trei DATE DEFAULT CURRENT_DATE,
+	data_ts_treinamento TIMESTAMPTZ NOT NULL,
+	data_finalizacao TIMESTAMPTZ NOT NULL DEFAULT now()
+);

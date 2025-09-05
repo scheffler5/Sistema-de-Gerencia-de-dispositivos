@@ -1,0 +1,76 @@
+{% extends 'dispositivos/base.html' %}
+{% block title %}{% if form.instance.pk %}Editar{% else %}Cadastrar{% endif %} Dispositivo{% endblock %}
+
+{% block content %}
+    <h1 class="h2">{% if form.instance.pk %}Editar{% else %}Cadastrar{% endif %} {{ tipo_dispositivo|title }}</h1>
+    <hr>
+    <div class="card p-4 shadow-sm">
+        <form method="POST">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            {% if tipo_dispositivo == 'computador' %}
+                <div class="row">
+                    <div class="col-md-6 mb-3">{{ form.endereco_mac.label_tag }} {{ form.endereco_mac }} {{ form.endereco_mac.errors }}</div>
+                    <div class="col-md-6 mb-3">{{ form.nome.label_tag }} {{ form.nome }} {{ form.nome.errors }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">{{ form.ip_dispositivo.label_tag }} {{ form.ip_dispositivo }} {{ form.ip_dispositivo.errors }}</div>
+                    <div class="col-md-6 mb-3">{{ form.modelo.label_tag }} {{ form.modelo }} {{ form.modelo.errors }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">{{ form.setor.label_tag }} {{ form.setor }} {{ form.setor.errors }}</div>
+                    <div class="col-md-6 mb-3">{{ form.data_instalacao.label_tag }} {{ form.data_instalacao }} {{ form.data_instalacao.errors }}</div>
+                </div><hr>
+                <div class="row">
+                    <div class="col-md-6 mb-3">{{ form.marca_processador.label_tag }} {{ form.marca_processador }} {{ form.marca_processador.errors }}</div>
+                    <div class="col-md-6 mb-3">{{ form.frequencia_processador.label_tag }} {{ form.frequencia_processador }} {{ form.frequencia_processador.errors }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">{{ form.tamanho_memoria.label_tag }} {{ form.tamanho_memoria }} {{ form.tamanho_memoria.errors }}</div>
+                    <div class="col-md-6 mb-3">{{ form.velocidade_memoria.label_tag }} {{ form.velocidade_memoria }} {{ form.velocidade_memoria.errors }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">{{ form.tipo_armazenamento.label_tag }} {{ form.tipo_armazenamento }} {{ form.tipo_armazenamento.errors }}</div>
+                    <div class="col-md-6 mb-3">{{ form.tamanho_armazenamento.label_tag }} {{ form.tamanho_armazenamento }} {{ form.tamanho_armazenamento.errors }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">{{ form.versao_so.label_tag }} {{ form.versao_so }} {{ form.versao_so.errors }}</div>
+                    <div class="col-md-6 mb-3">{{ form.potencia_fonte.label_tag }} {{ form.potencia_fonte }} {{ form.potencia_fonte.errors }}</div>
+                </div>
+                <div class="form-check my-3">{{ form.ativo }} {{ form.ativo.label_tag }}</div>
+
+            {% elif tipo_dispositivo == 'impressora' %}
+                <div class="row">
+                    <div class="col-md-6 mb-3">{{ form.serial.label_tag }} {{ form.serial }} {{ form.serial.errors }}</div>
+                    <div class="col-md-6 mb-3">{{ form.nome_impressora.label_tag }} {{ form.nome_impressora }} {{ form.nome_impressora.errors }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">{{ form.modelo.label_tag }} {{ form.modelo }} {{ form.modelo.errors }}</div>
+                    <div class="col-md-6 mb-3">{{ form.toner.label_tag }} {{ form.toner }} {{ form.toner.errors }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">{{ form.proprietario.label_tag }} {{ form.proprietario }} {{ form.proprietario.errors }}</div>
+                    <div class="col-md-6 mb-3">{{ form.tipo_conexao.label_tag }} {{ form.tipo_conexao }} {{ form.tipo_conexao.errors }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">{{ form.ip_dispositivo.label_tag }} {{ form.ip_dispositivo }} {{ form.ip_dispositivo.errors }}</div>
+                    <div class="col-md-6 mb-3">{{ form.setor.label_tag }} {{ form.setor }} {{ form.setor.errors }}</div>
+                </div>
+                <div class="mb-3">{{ form.instalacao.label_tag }} {{ form.instalacao }} {{ form.instalacao.errors }}</div>
+            
+            {% else %}
+                {{ form.as_p }}
+            {% endif %}
+
+            <br>
+            <div class="text-end">
+                <a href="{% url 'dispositivos:inventario_geral' %}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

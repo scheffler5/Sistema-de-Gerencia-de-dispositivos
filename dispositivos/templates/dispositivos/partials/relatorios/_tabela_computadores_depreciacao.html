@@ -1,0 +1,21 @@
+<h4 class="mt-4">Análise de Depreciação</h4>
+<table class="table table-sm">
+    <thead><tr><th>Nome</th><th>Setor</th><th>IP</th><th class="text-center">Pontuação de Saúde</th></tr></thead>
+    <tbody>
+    {% for item in dados_depreciacao %}
+        <tr>
+            <td>{{ item.computador.nome }}</td>
+            <td>{{ item.computador.setor.nome }}</td>
+            <td>{{ item.computador.ip_dispositivo }}</td>
+            <td class="text-center">
+                {% if item.score < 40 %}<span class="badge bg-danger">{{ item.score }}% (Crítico)</span>
+                {% elif item.score < 70 %}<span class="badge bg-warning text-dark">{{ item.score }}% (Atenção)</span>
+                {% else %}<span class="badge bg-success">{{ item.score }}% (Bom)</span>
+                {% endif %}
+            </td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="4" class="text-center">Nenhum computador encontrado.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>

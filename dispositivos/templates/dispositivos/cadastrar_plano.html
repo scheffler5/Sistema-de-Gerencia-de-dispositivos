@@ -1,0 +1,64 @@
+{% extends 'dispositivos/base.html' %} {% block title %}Agendar Manutenção{% endblock %} {% block styles %}{# Inclua os mesmos estilos de modal da tela anterior aqui #}{% endblock %} {% block content %}
+<h1>Agendar Manutenção Preventiva</h1>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <input type="hidden" id="id_dispositivo_selecionado" name="dispositivo_id" required>
+
+    <div>
+        <label for="nome_dispositivo_display">Dispositivo:</label><br>
+        <input type="text" id="nome_dispositivo_display" readonly placeholder="Clique em procurar...">
+        <button type="button" id="btn-abrir-modal-dispositivos">Procurar Dispositivo</button>
+    </div>
+    <br>
+
+    <button type="submit">Agendar</button>
+</form>
+
+<div id="modal-dispositivos" class="modal">
+    <div class="modal-content">
+        <span class="fechar-modal">&times;</span>
+        <h2>Selecione um Dispositivo</h2>
+        <div id="lista-de-dispositivos-modal">
+            {% for dispositivo in lista_dispositivos %}
+            <div class="item-selecionavel" data-id="{{ dispositivo.id }}" data-nome="{{ dispositivo.nome_descritivo }}">
+                {{ dispositivo.nome_descritivo }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+    const modalDispositivos = document.getElementById('modal-dispositivos');
+    const btnAbrirModal = document.getElementById('btn-abrir-modal-dispositivos');
+    const btnFecharModal = modalDispositivos.querySelector('.fechar-modal');
+    const inputIdDispositivo = document.getElementById('id_dispositivo_selecionado');
+    const inputDisplayDispositivo = document.getElementById('nome_dispositivo_display');
+    const itensSelecionaveis = modalDispositivos.querySelectorAll('.item-selecionavel');
+    btnAbrirModal.addEventListener('click', function() {
+        modalDispositivos.style.display = 'block';
+    });
+
+    btnFecharModal.addEventListener('click', function() {
+        modalDispositivos.style.display = 'none';
+    });
+
+    window.addEventListener('click', function(event) {
+        if (event.target == modalDispositivos) {
+            modalDispositivos.style.display = 'none';
+        }
+    });
+
+    itensSelecionaveis.forEach(function(item) {
+        item.addEventListener('click', function() {
+            const idSelecionado = this.dataset.id;
+            const nomeSelecionado = this.dataset.nome;
+            inputIdDispositivo.value = idSelecionado;
+            inputDisplayDispositivo.value = nomeSelecionado;
+            modalDispositivos.style.display = 'none';
+        });
+    });
+</script>
+{% endblock %}

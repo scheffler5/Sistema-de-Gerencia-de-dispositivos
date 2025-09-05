@@ -1,0 +1,145 @@
+{% extends 'dispositivos/base.html' %} {% block title %}Novo Treinamento Interativo{% endblock %} {% block styles %}
+<style>
+    /* --- Estilos para o Modal --- */
+    
+    .modal {
+        display: none;
+        /* Escondido por padrão */
+        position: fixed;
+        /* Fica fixo na tela */
+        z-index: 1000;
+        /* Fica na frente de tudo */
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        /* Permite rolagem se o conteúdo for grande */
+        background-color: rgba(0, 0, 0, 0.5);
+        /* Fundo preto semi-transparente */
+    }
+    
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        /* Centraliza verticalmente e horizontalmente */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+        position: relative;
+    }
+    
+    .fechar-modal {
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 25px;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    
+    .fechar-modal:hover,
+    .fechar-modal:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    
+    .item-selecionavel {
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .item-selecionavel:hover {
+        background-color: #f2f2f2;
+        cursor: pointer;
+    }
+</style>
+{% endblock %} {% block content %}
+<h1>Cadastrar Novo Treinamento (Interface Interativa)</h1>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <input type="hidden" id="id_setor_selecionado" name="setor_selecionado_id" required>
+
+    <div>
+        <label for="nome_setor_display">Setor:</label><br>
+        <input type="text" id="nome_setor_display" readonly placeholder="Clique em procurar para selecionar..." style="background-color: #eee;">
+
+        <button type="button" id="btn-abrir-modal-setores">Procurar Setor</button>
+    </div>
+    <br>
+
+    <div>
+        <label for="titulo">Título:</label><br>
+        <input type="text" id="titulo" name="titulo_treinamento" required>
+    </div>
+    <br>
+    <button type="submit">Salvar Treinamento</button>
+</form>
+
+
+<div id="modal-setores" class="modal">
+    <div class="modal-content">
+        <span class="fechar-modal">&times;</span>
+        <h2>Selecione um Setor</h2>
+        <div id="lista-de-setores-modal">
+            {% for setor in todos_os_setores %}
+            <div class="item-selecionavel" data-id="{{ setor.id }}" data-nome="{{ setor.nome }}">
+                {{ setor.nome }}
+            </div>
+            {% empty %}
+            <p>Nenhum setor cadastrado.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Pegando referências aos elementos HTML que vamos manipular
+    const modal = document.getElementById('modal-setores');
+    const btnAbrirModal = document.getElementById('btn-abrir-modal-setores');
+    const btnFecharModal = document.querySelector('.fechar-modal');
+
+    const inputHiddenIdSetor = document.getElementById('id_setor_selecionado');
+    const inputNomeSetorDisplay = document.getElementById('nome_setor_display');
+
+    const itensSelecionaveis = document.querySelectorAll('.item-selecionavel');
+
+    // Adiciona o evento para ABRIR o modal quando o botão for clicado
+    btnAbrirModal.onclick = function() {
+        modal.style.display = "block";
+    }
+
+    // Adiciona o evento para FECHAR o modal quando o 'X' for clicado
+    btnFecharModal.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // Adiciona o evento para FECHAR o modal se o usuário clicar fora da caixa de conteúdo
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    // Adiciona um evento de clique para CADA item da lista no modal
+    itensSelecionaveis.forEach(function(item) {
+        item.onclick = function() {
+            // 1. Pega o ID e o Nome dos data-attributes do item clicado
+            const idSelecionado = item.getAttribute('data-id');
+            const nomeSelecionado = item.getAttribute('data-nome');
+
+            // 2. Preenche os campos do formulário com os valores selecionados
+            inputHiddenIdSetor.value = idSelecionado;
+            inputNomeSetorDisplay.value = nomeSelecionado;
+
+            // 3. Fecha o modal
+            modal.style.display = "none";
+        }
+    });
+</script>
+{% endblock %}

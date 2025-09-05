@@ -1,0 +1,14 @@
+{% extends 'dispositivos/base.html' %}
+{% block title %}Selecionar Tipo de Dispositivo{% endblock %}
+
+{% block content %}
+    <h1 class="h2">Cadastrar Novo Dispositivo</h1>
+    <p>Selecione o tipo de dispositivo que deseja cadastrar.</p>
+    <hr>
+    <div class="row">
+        <div class="col-md-3"><a href="{% url 'dispositivos:cadastrar_dispositivo_tipo' tipo='computador' %}" class="btn btn-lg btn-outline-primary w-100 p-4">Computador</a></div>
+        <div class="col-md-3"><a href="{% url 'dispositivos:cadastrar_dispositivo_tipo' tipo='servidor' %}" class="btn btn-lg btn-outline-primary w-100 p-4">Servidor</a></div>
+        <div class="col-md-3"><a href="{% url 'dispositivos:cadastrar_dispositivo_tipo' tipo='roteador' %}" class="btn btn-lg btn-outline-primary w-100 p-4">Roteador</a></div>
+        <div class="col-md-3"><a href="{% url 'dispositivos:cadastrar_dispositivo_tipo' tipo='impressora' %}" class="btn btn-lg btn-outline-primary w-100 p-4">Impressora</a></div>
+    </div>
+{% endblock %}

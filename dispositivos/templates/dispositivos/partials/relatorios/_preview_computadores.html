@@ -1,0 +1,28 @@
+{% load static %}
+{% include 'dispositivos/partials/relatorios/_relatorio_cabecalho.html' with titulo_relatorio="Relatório de Computadores" %}
+
+{% if dados_depreciacao %}
+    {% include 'dispositivos/partials/relatorios/_tabela_computadores_depreciacao.html' %}
+{% else %}
+    <h4 class="mt-4">Listagem Simples</h4>
+    <table class="table table-sm">
+        <thead><tr><th>Nome</th><th>Setor</th><th>IP</th><th>MAC</th><th>S.O.</th></tr></thead>
+        <tbody>
+        {% for comp in computadores %}
+            <tr><td>{{ comp.nome }}</td><td>{{ comp.setor.nome }}</td><td>{{ comp.ip_dispositivo }}</td><td>{{ comp.endereco_mac }}</td><td>{{ comp.versao_so }}</td></tr>
+        {% empty %}
+            <tr><td colspan="5" class="text-center">Nenhum computador encontrado com os filtros aplicados.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+{% if graph_ativos %}
+    <hr>
+    <div class="row mt-4">
+        <div class="col-md-6">{{ graph_ativos|safe }}</div>
+        <div class="col-md-6">
+            {# Aqui poderia entrar o segundo gráfico, de computadores por setor #}
+        </div>
+    </div>
+{% endif %}

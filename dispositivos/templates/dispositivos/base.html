@@ -1,0 +1,150 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gestor de Ativos de TI{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        /* CSS ESTRUTURAL (sem alterações) */
+        html, body { height: 100%; overflow: hidden; }
+        body { display: flex; flex-direction: column; background-color: #f0f2f5; }
+        .main-header { flex-shrink: 0; background-color: white; border-bottom: 1px solid #dee2e6; }
+        main.container-fluid { flex-grow: 1; overflow-y: auto; padding: 20px 30px; }
+
+        .hotbar {
+            flex-shrink: 0;
+            position: relative;
+            width: 20%; 
+            height: 50px;
+            margin: 0 auto 25px auto;
+            background-color: rgba(33, 37, 41, 0.60); 
+            color: white;
+            border-radius: 15px; /* Arredonda todos os 4 cantos */
+            display: flex;
+            align-items: center; /* Centraliza os itens verticalmente */
+            padding: 0 25px; /* Espaçamento interno horizontal */
+        }
+        
+        .hotbar-items {
+            display: flex;
+            align-items: center;
+            gap: 20px; /* Espaço entre os itens de acesso rápido */
+        }
+
+        .hotbar-link {
+        color: #f8f9fa; /* Cor do texto dos links (branco suave) */
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+        font-size: 1.0rem; /* Diminui um pouco o tamanho da fonte */
+    }
+    .hotbar-link:hover {
+        color: #58a6ff; /* Cor do link ao passar o mouse (azul claro) */
+        text-decoration: none; /* Garante que não apareça sublinhado */
+    }
+        .main-nav { flex-grow: 1; }
+
+        .main-nav-link {
+            margin: 0 0.5rem;
+            font-weight: 500;
+            color: #495057;
+            transition: all 0.2s ease-in-out;
+            border-radius: 6px;
+            text-decoration: none;
+
+            
+            font-size: 1.3rem;  
+            padding: 10px 15px; 
+           
+        }
+
+        /* Efeito HOVER (mouse sobre) para os links */
+        .main-nav-link:hover {
+            color: #0d6efd; /* Cor azul padrão do Bootstrap */
+            background-color: #eef5ff; /* Um fundo azul bem claro e sutil */
+        }
+
+        /* Estilo para o link ATIVO (página atual), que tem a classe 'link-secondary' */
+        .main-nav-link.link-secondary {
+            color: #0d6efd; /* Cor azul padrão do Bootstrap */
+            font-weight: bold; /* Deixa em negrito para destacar */
+            background-color: #eef5ff; /* Fundo igual ao do hover para consistência */
+        }
+    </style>
+    {% block styles %}{% endblock %}
+</head>
+<body>
+    <header class="main-header p-3">
+    <div class="container-fluid">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+            <a href="{% url 'dispositivos:dashboard' %}" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none me-lg-4">
+                <img src="{% static 'images/iconee_hospital.png' %}" alt="Logo" height="80">
+            </a>
+            
+            <ul class="nav col-12 col-lg-auto mb-2 justify-content-center mb-md-0 main-nav">
+                <li><a href="{% url 'dispositivos:dashboard' %}" class="nav-link px-2 {% if request.resolver_match.url_name == 'dashboard' %}link-secondary{% endif %} main-nav-link">Dashboard</a></li>
+                <li><a href="{% url 'dispositivos:inventario_geral' %}" class="nav-link px-2 {% if request.resolver_match.url_name == 'inventario_geral' %}link-secondary{% endif %} main-nav-link">Dispositivos</a></li>
+                <li><a href="{% url 'dispositivos:lista_planos' %}" class="nav-link px-2 {% if 'planos' in request.path %}link-secondary{% endif %} main-nav-link">Planos de Manutenção</a></li>
+                <li><a href="{% url 'dispositivos:relatorios' %}" class="nav-link px-2 {% if request.resolver_match.url_name == 'relatorios' %}link-secondary{% endif %} main-nav-link">Relatórios</a></li>
+                <li><a href="{% url 'dispositivos:lista_treinamentos' %}" class="nav-link px-2 {% if request.resolver_match.url_name == 'lista_treinamentos' %}link-secondary{% endif %} main-nav-link">Treinamentos</a></li>
+                <li><a href="{% url 'dispositivos:lista_chamados' %}" class="nav-link px-2 {% if request.resolver_match.url_name == 'lista_chamados' %}link-secondary{% endif %} main-nav-link">Chamados</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link px-2 main-nav-link dropdown-toggle {% if request.resolver_match.url_name in 'lista_logins_pc,lista_pastas_publicas,lista_hosts,lista_emails_novos,lista_emails_antigos' %}link-secondary{% endif %}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Mais
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'dispositivos:lista_logins_pc' %}">Logins de PC</a></li>
+                        <li><a class="dropdown-item" href="{% url 'dispositivos:lista_pastas_publicas' %}">Pastas Públicas</a></li>
+                        <li><a class="dropdown-item" href="{% url 'dispositivos:lista_hosts' %}">Hosts</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'dispositivos:lista_emails_novos' %}">Emails Novos</a></li>
+                        <li><a class="dropdown-item" href="{% url 'dispositivos:lista_emails_antigos' %}">Emails Antigos</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <div class="dropdown text-end">
+                <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-person-circle fs-4 me-2"></i>
+                    <strong>{{ nome_usuario_logado|default:'Usuário' }} ({{ funcao_usuario_logado|default:'N/A' }})</strong>
+                </a>
+                <ul class="dropdown-menu text-small">
+                    <li><a class="dropdown-item" href="{% url 'dispositivos:lista_usuarios' %}">Listar Usuários</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#">Sair</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+
+    <main class="container-fluid">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer class="hotbar">
+        <div class="hotbar-items">          
+            <a href="{% url 'dispositivos:cadastrar_chamado' %}" class="hotbar-link">
+                <i class="bi bi-plus-circle-fill me-1"></i>
+                Abrir Chamado
+            </a>
+
+            <a href="{% url 'dispositivos:cadastrar_plano' %}" class="hotbar-link">
+                <i class="bi bi-calendar-plus-fill me-1"></i>
+                Agendar Manutenção
+            </a>
+
+            <a href="{% url 'dispositivos:cadastrar_treinamento' %}" class="hotbar-link">
+                <i class="bi bi-mortarboard-fill me-1"></i>
+                Novo Treinamento
+            </a>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

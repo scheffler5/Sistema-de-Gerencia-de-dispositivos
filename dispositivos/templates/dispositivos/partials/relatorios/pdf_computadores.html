@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Computadores</title>
+    <style>
+        /* ESTILOS CSS SIMPLES E INCORPORADOS, COMPATÍVEIS COM XHML2PDF */
+        @page {
+            size: a4 portrait; /* Define o tamanho da página como A4 em modo retrato */
+            margin: 1.5cm; /* Define as margens da página */
+        }
+        body { 
+            font-family: "Helvetica", "Arial", sans-serif; 
+            font-size: 10pt;
+            color: #333;
+        }
+        .header-logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo {
+            max-width: 200px; /* Ajuste o tamanho do logo conforme necessário */
+        }
+        h1 {
+            text-align: center;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            font-size: 18pt;
+        }
+        .report-info {
+            text-align: right;
+            font-size: 9pt;
+            color: #777;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; /* Essencial para as bordas funcionarem */
+            margin-top: 20px;
+        }
+        th, td { 
+            border: 1px solid #aaa; 
+            padding: 6px; 
+            text-align: left;
+            /* Permite que textos longos quebrem a linha */
+            word-wrap: break-word;
+        }
+        th { 
+            background-color: #f2f2f2; 
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-logo">
+        <img src="{% static 'images/icone_hospital.png' %}" class="logo">
+    </div>
+
+    <h1>Relatório de Inventário - Computadores</h1>
+    <p class="report-info">Relatório gerado em: {% now "d/m/Y H:i" %}</p>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Nome do Host</th>
+                <th>Setor</th>
+                <th>Endereço IP</th>
+                <th>Endereço MAC</th>
+                <th>S.O.</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for comp in computadores %}
+                <tr>
+                    <td>{{ comp.nome }}</td>
+                    <td>{{ comp.setor.nome }}</td>
+                    <td>{{ comp.ip_dispositivo }}</td>
+                    <td>{{ comp.endereco_mac }}</td>
+                    <td>{{ comp.versao_so }}</td>
+                    <td>{{ comp.ativo|yesno:"Ativo,Inativo" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6" style="text-align: center;">Nenhum computador encontrado com os filtros aplicados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

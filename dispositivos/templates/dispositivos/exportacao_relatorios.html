@@ -1,0 +1,162 @@
+{% extends 'dispositivos/base.html' %}
+{% block title %}Exportação de Relatórios{% endblock %}
+
+{% block styles %}
+<style>
+    .report-builder-grid { display: grid; grid-template-columns: 380px 1fr; gap: 30px; height: calc(100vh - 180px); }
+    .filter-sidebar { background: #fff; padding: 20px; border-radius: 8px; overflow-y: auto; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .preview-area { background: #e9ecef; padding: 20px; overflow-y: auto; }
+    .preview-sheet { background: white; width: 210mm; min-height: 297mm; margin: auto; padding: 2cm; box-shadow: 0 0 10px rgba(0,0,0,0.1); color: black; }
+    .secondary-filters { display: none; border-left: 3px solid #eee; padding-left: 15px; margin-top: 15px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="h2 mb-4">Construtor de Relatórios</h1>
+<div class="report-builder-grid">
+    <aside class="filter-sidebar">
+        <h5>Filtros do Relatório</h5><hr>
+        <div class="mb-3">
+            <label for="categoria_principal" class="form-label fw-bold">Categoria Principal</label>
+            <select id="categoria_principal" name="categoria_principal" class="form-select">
+                <option value="">Geral (Visão Completa)</option>
+                <option value="computadores">Computadores</option>
+                <option value="servidores">Servidores</option>
+                <option value="roteadores">Roteadores</option>
+                <option value="impressoras">Impressoras</option>
+                <option value="chamados">Chamados</option>
+            </select>
+        </div>
+        
+        <div id="filtros-computadores" class="secondary-filters">
+            <label class="form-label fw-bold">Opções de Computadores</label>
+            <div class="mb-2">
+                <label class="form-label form-label-sm">Tipo de Listagem</label>
+                <select name="tipo_listagem" class="form-select form-select-sm">
+                    <option value="simples">Listagem Simples</option>
+                    <option value="depreciacao">Listagem com Depreciação</option>
+                </select>
+            </div>
+            <div class="mb-2">
+                <label class="form-label form-label-sm">Data de Instalação</label>
+                <div class="input-group input-group-sm">
+                    <input type="date" name="data_instalacao_inicio" class="form-control">
+                    <span class="input-group-text">até</span>
+                    <input type="date" name="data_instalacao_fim" class="form-control">
+                </div>
+            </div>
+            <div class="form-check form-switch my-3">
+                <input type="checkbox" name="com_graficos" value="true" class="form-check-input" id="comp_graficos">
+                <label for="comp_graficos">Incluir Gráficos</label>
+            </div>
+        </div>
+        
+        <hr class="mt-4"><button id="btn-exportar-pdf" class="btn btn-success w-100"><i class="bi bi-file-earmark-pdf-fill"></i> Baixar PDF</button>
+    </aside>
+
+    <section class="preview-area">
+        <div class="preview-sheet">
+            <div id="preview-content">
+                <p class="text-muted">Selecione os filtros para gerar a pré-visualização do relatório.</p>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const categoriaSelect = document.getElementById('categoria_principal');
+    const filterSidebar = document.querySelector('.filter-sidebar');
+    const previewContent = document.getElementById('preview-content');
+    const btnExportar = document.getElementById('btn-exportar-pdf');
+
+    // --- FUNÇÃO getFiltros() CORRIGIDA E COMPLETA ---
+    function getFiltros() {
+        const params = new URLSearchParams();
+        // Pega todos os inputs, selects e checkboxes DENTRO da sidebar de filtros
+        const allFilters = filterSidebar.querySelectorAll('select, input');
+        
+        allFilters.forEach(el => {
+            // Verifica se o contêiner do filtro está visível (ou se é o filtro principal)
+            const parentContainer = el.closest('.secondary-filters');
+            const isVisible = !parentContainer || parentContainer.style.display !== 'none';
+            
+            // Só adiciona o parâmetro se o campo tiver nome, valor e estiver visível
+            if (el.name && el.value && isVisible) {
+                if (el.type === 'checkbox') {
+                    if (el.checked) params.append(el.name, el.value);
+                } else {
+                    params.append(el.name, el.value);
+                }
+            }
+        });
+        return params.toString();
+    }
+
+    async function atualizarPreview() {
+        previewContent.innerHTML = '<div class="d-flex justify-content-center align-items-center h-100"><div class="spinner-border text-primary"></div></div>';
+        const filtros = getFiltros();
+        // A URL da API que criámos na view
+        const url = `{% url 'dispositivos:api_preview_relatorio' %}?${filtros}`;
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            previewContent.innerHTML = data.html;
+        } catch (error) {
+            console.error("Erro no fetch:", error);
+            previewContent.innerHTML = '<p class="text-danger">Erro ao carregar preview.</p>';
+        }
+    }
+
+    // Ouve por mudanças em QUALQUER filtro dentro da sidebar
+    filterSidebar.addEventListener('change', function(event) {
+        if (event.target.id === 'categoria_principal') {
+            document.querySelectorAll('.secondary-filters').forEach(el => el.style.display = 'none');
+            const filtrosToShow = document.getElementById(`filtros-${event.target.value}`);
+            if (filtrosToShow) filtrosToShow.style.display = 'block';
+        }
+        atualizarPreview();
+    });
+
+    // Lógica do botão de exportar
+    btnExportar.addEventListener('click', function() {
+        const filtros = getFiltros();
+        const url = `{% url 'dispositivos:exportar_relatorio_pdf' %}?${filtros}`;
+        window.open(url, '_blank');
+    });
+     btnExportar.addEventListener('click', function() {
+        // 1. Pega o HTML que está atualmente na pré-visualização
+        const html_do_preview = previewContent.innerHTML;
+        
+        // 2. Cria um formulário "fantasma" para enviar os dados via POST
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = "{% url 'dispositivos:exportar_html_para_pdf' %}";
+        
+        // Adiciona o token de segurança CSRF
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = '{{ csrf_token }}';
+        form.appendChild(csrfInput);
+
+        // Adiciona o HTML do preview como um campo do formulário
+        const htmlInput = document.createElement('input');
+        htmlInput.type = 'hidden';
+        htmlInput.name = 'html_content';
+        htmlInput.value = html_do_preview;
+        form.appendChild(htmlInput);
+
+        // 3. Adiciona o formulário à página, submete-o, e depois remove-o
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+    });
+    // Inicia com a preview geral
+    atualizarPreview();
+});
+</script>
+{% endblock %}

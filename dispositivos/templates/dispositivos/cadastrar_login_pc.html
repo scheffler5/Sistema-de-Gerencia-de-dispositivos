@@ -1,0 +1,23 @@
+{% extends 'dispositivos/base.html' %}
+
+{% block title %}Cadastrar Login de PC{% endblock %}
+
+{% block content %}
+    <h1 class="h2">Cadastrar Novo Login de PC</h1>
+    <p>Preencha os dados abaixo para o novo registro.</p>
+    <hr>
+
+    <div class="card p-4">
+        <form method="POST" novalidate>
+            {% csrf_token %}
+            
+            {{ form.as_p }}
+            
+            <br>
+            <div>
+                <a href="{% url 'dispositivos:lista_logins_pc' %}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

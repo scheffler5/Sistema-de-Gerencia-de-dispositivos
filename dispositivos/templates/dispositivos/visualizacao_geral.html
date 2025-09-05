@@ -1,0 +1,143 @@
+{% extends 'dispositivos/base.html' %} {% block title %}Informações Gerais{% endblock %} {% block styles %}
+<style>
+    .nav-tabs {
+        display: flex;
+        border-bottom: 2px solid #ccc;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    
+    .nav-tabs a {
+        padding: 10px 15px;
+        text-decoration: none;
+        color: #555;
+        border: 1px solid transparent;
+    }
+    
+    .nav-tabs a.active {
+        border: 1px solid #ccc;
+        border-bottom: 2px solid white;
+        font-weight: bold;
+        margin-bottom: -2px;
+        background-color: white;
+    }
+    
+    .senha-coluna {
+        color: #c0392b;
+        font-weight: bold;
+        font-family: monospace;
+    }
+</style>
+{% endblock %} {% block content %}
+<h1>Painel de Informações de TI</h1>
+
+<nav class="nav-tabs">
+    <a href="?aba=logins_pc" class="{% if aba_ativa == 'logins_pc' %}active{% endif %}">Logins de PC</a>
+    <a href="?aba=pastas_publicas" class="{% if aba_ativa == 'pastas_publicas' %}active{% endif %}">Pastas Públicas</a>
+    <a href="?aba=hosts" class="{% if aba_ativa == 'hosts' %}active{% endif %}">Hosts</a>
+    <a href="?aba=emails_novos" class="{% if aba_ativa == 'emails_novos' %}active{% endif %}">Emails Novos</a>
+    <a href="?aba=emails_antigos" class="{% if aba_ativa == 'emails_antigos' %}active{% endif %}">Emails Antigos</a>
+</nav>
+
+{% if aba_ativa == 'logins_pc' %}
+<h2>Logins de Usuário por Computador</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Usuário</th>
+            <th>Senha</th>
+            <th>Computador</th>
+            <th>Setor do Computador</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in dados_para_tabela %}
+        <tr>
+            <td>{{ item.nome_user }}</td>
+            <td class="senha-coluna">{{ item.senha }}</td>
+            <td>{{ item.computadores.nome }}</td>
+            <td>{{ item.computadores.setor.nome }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">Nenhum login de PC cadastrado.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% elif aba_ativa == 'pastas_publicas' %}
+<h2>Pastas Públicas</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Usuário</th>
+            <th>Senha</th>
+            <th>Setor</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in dados_para_tabela %}
+        <tr>
+            <td>{{ item.nome_user }}</td>
+            <td class="senha-coluna">{{ item.senha }}</td>
+            <td>{{ item.setores.nome|default:"N/A" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3">Nenhuma pasta pública cadastrada.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% elif aba_ativa == 'hosts' %}
+<h2>Hosts Cadastrados</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Nome do Host</th>
+            <th>Endereço IP</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in dados_para_tabela %}
+        <tr>
+            <td>{{ item.nome_host }}</td>
+            <td>{{ item.ip_host }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="2">Nenhum host cadastrado.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% elif aba_ativa == 'emails_novos' or aba_ativa == 'emails_antigos' %}
+<h2>{{ "Emails Novos" if aba_ativa == 'emails_novos' else "Emails Antigos" }}</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Endereço de Email</th>
+            <th>Senha</th>
+            <th>Tamanho (GB)</th>
+            <th>Setor</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in dados_para_tabela %}
+        <tr>
+            <td>{{ item.nome_email }}</td>
+            <td class="senha-coluna">{{ item.senha }}</td>
+            <td>{{ item.tamanho_email }}</td>
+            <td>{{ item.setores.nome|default:"N/A" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">Nenhum email cadastrado nesta categoria.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %} {% endblock %}

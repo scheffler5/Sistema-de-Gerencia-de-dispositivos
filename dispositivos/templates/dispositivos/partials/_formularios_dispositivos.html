@@ -1,0 +1,59 @@
+<ul class="nav nav-tabs" id="deviceTabs" role="tablist">
+    <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#form-computador" type="button" role="tab">Computador</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-servidor" type="button" role="tab">Servidor</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-roteador" type="button" role="tab">Roteador</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-impressora" type="button" role="tab">Impressora</button></li>
+</ul>
+<div class="tab-content pt-3">
+    <div class="tab-pane fade show active" id="form-computador" role="tabpanel">
+        <form id="formComputador">
+            <div class="row"><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Endereço MAC*</label><input type="text" name="endereco_mac" class="form-control form-control-sm unique-identifier" required></div><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Nome do Host*</label><input type="text" name="nome" class="form-control form-control-sm" required></div></div>
+            <div class="row"><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Endereço IP*</label><input type="text" name="ip_dispositivo" class="form-control form-control-sm" required></div><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Modelo</label><input type="text" name="modelo" class="form-control form-control-sm"></div></div>
+            <div class="row"><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Setor*</label><select name="setor" class="form-select form-select-sm" required>{% for s in todos_os_setores %}<option value="{{ s.id }}">{{ s.nome }}</option>{% endfor %}</select></div><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Data de Instalação*</label><input type="date" name="data_instalacao" class="form-control form-control-sm" required></div></div><hr>
+            <div class="row"><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Marca Processador</label><input type="text" name="marca_processador" class="form-control form-control-sm"></div><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Frequência (GHz)</label><input type="number" step="0.01" name="frequencia_processador" class="form-control form-control-sm"></div></div>
+            <div class="row"><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Memória (GB)</label><input type="number" name="tamanho_memoria" class="form-control form-control-sm"></div><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Velocidade (MHz)</label><input type="number" name="velocidade_memoria" class="form-control form-control-sm"></div></div>
+            <div class="row"><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Armazenamento</label><input type="text" name="tipo_armazenamento" class="form-control form-control-sm" placeholder="SSD, HDD"></div><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Tamanho (GB)</label><input type="number" name="tamanho_armazenamento" class="form-control form-control-sm"></div></div>
+            <div class="row"><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Versão S.O.</label><input type="text" name="versao_so" class="form-control form-control-sm"></div><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Potência Fonte (W)</label><input type="number" name="potencia_fonte" class="form-control form-control-sm"></div></div>
+            <div class="form-check my-3"><input type="checkbox" name="ativo" class="form-check-input" id="comp-ativo" value="true" checked><label class="form-check-label" for="comp-ativo">Ativo</label></div>
+            <div class="text-end"><button type="submit" class="btn btn-success">Salvar ou Editar</button></div>
+        </form>
+    </div>
+    <div class="tab-pane fade" id="form-servidor" role="tabpanel">
+        <form id="formServidor">
+            <div class="row"><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Service Tag*</label><input type="text" name="service_tag" class="form-control form-control-sm unique-identifier" required></div><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Express Code</label><input type="text" name="express_code" class="form-control form-control-sm"></div></div>
+            <div class="row"><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Marca</label><input type="text" name="marca" class="form-control form-control-sm"></div><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Modelo</label><input type="text" name="modelo" class="form-control form-control-sm"></div></div>
+            <div class="row"><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Endereço IP*</label><input type="text" name="ip_dispositivo" class="form-control form-control-sm" required></div><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Endereço MAC*</label><input type="text" name="endereco_mac" class="form-control form-control-sm" required></div></div>
+            <div class="row"><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Setor*</label><select name="setor" class="form-select form-select-sm" required>{% for s in todos_os_setores %}<option value="{{ s.id }}">{{ s.nome }}</option>{% endfor %}</select></div><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Data de Instalação*</label><input type="date" name="data_instalacao" class="form-control form-control-sm" required></div></div><hr>
+            <div class="row"><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Marca Processador</label><input type="text" name="marca_processador" class="form-control form-control-sm"></div><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Frequência (GHz)</label><input type="number" step="0.01" name="frequencia_processador" class="form-control form-control-sm"></div></div>
+            <div class="row"><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Memória (GB)</label><input type="number" name="tamanho_memoria" class="form-control form-control-sm"></div><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Velocidade (MHz)</label><input type="number" name="velocidade_memoria" class="form-control form-control-sm"></div></div>
+            <div class="row"><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Armazenamento</label><input type="text" name="tipo_armazenamento" class="form-control form-control-sm" placeholder="SSD, HDD, RAID"></div><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Tamanho (GB)</label><input type="number" name="tamanho_armazenamento" class="form-control form-control-sm"></div></div>
+            <div class="mb-2"><label class="form-label form-label-sm">Versão S.O.</label><input type="text" name="versao_so" class="form-control form-control-sm"></div>
+            <div class="form-check my-3"><input type="checkbox" name="ativo" class="form-check-input" id="serv-ativo" value="true" checked><label class="form-check-label" for="serv-ativo">Ativo</label></div>
+            <div class="text-end"><button type="submit" class="btn btn-success">Salvar ou Editar</button></div>
+        </form>
+    </div>
+    <div class="tab-pane fade" id="form-roteador" role="tabpanel"><form id="formRoteador"><div class="mb-3"><label class="form-label form-label-sm">Endereço MAC*</label><input type="text" name="endereco_mac" class="form-control form-control-sm unique-identifier" required></div><div class="row"><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Marca</label><input type="text" name="marca" class="form-control form-control-sm"></div><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Modelo</label><input type="text" name="modelo" class="form-control form-control-sm"></div></div><div class="mb-3"><label class="form-label form-label-sm">Endereço IP*</label><input type="text" name="ip_dispositivo" class="form-control form-control-sm" required></div><div class="row"><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Data de Instalação*</label><input type="date" name="data_instalacao" class="form-control form-control-sm" required></div><div class="col-md-6 mb-2"><label class="form-label form-label-sm">Setor*</label><select name="setor" class="form-select form-select-sm" required>{% for s in todos_os_setores %}<option value="{{ s.id }}">{{ s.nome }}</option>{% endfor %}</select></div></div><div class="text-end"><button type="submit" class="btn btn-success">Salvar ou Editar</button></div></form></div>
+    <div class="tab-pane fade" id="form-impressora" role="tabpanel">
+        <form id="formImpressora">
+            <div class="mb-3"><label class="form-label form-label-sm">Serial*</label><input type="text" name="serial" class="form-control form-control-sm unique-identifier" required></div>
+            <div class="mb-3"><label class="form-label form-label-sm">Nome da Impressora (na rede)*</label><input type="text" name="nome_impressora" class="form-control form-control-sm" required></div>
+            <div class="row">
+                <div class="col-md-6 mb-2"><label class="form-label form-label-sm">Modelo</label><input type="text" name="modelo" class="form-control form-control-sm"></div>
+                <div class="col-md-6 mb-2"><label class="form-label form-label-sm">Toner</label><input type="text" name="toner" class="form-control form-control-sm"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-2"><label class="form-label form-label-sm">Proprietário</label><input type="text" name="proprietario" class="form-control form-control-sm"></div>
+                <div class="col-md-6 mb-2"><label class="form-label form-label-sm">Tipo de Conexão</label><input type="text" name="tipo_conexao" class="form-control form-control-sm"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-2"><label class="form-label form-label-sm">Endereço IP (Opcional)</label><input type="text" name="ip_dispositivo" class="form-control form-control-sm"></div>
+                <div class="col-md-6 mb-2"><label class="form-label form-label-sm">Setor*</label><select name="setor" class="form-select form-select-sm" required>{% for s in todos_os_setores %}<option value="{{ s.id }}">{{ s.nome }}</option>{% endfor %}</select></div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label form-label-sm">Data de Instalação</label>
+                <input type="date" name="data_instalacao" class="form-control form-control-sm">
+            </div>
+            <div class="text-end"><button type="submit" class="btn btn-success">Salvar ou Editar</button></div>
+        </form>
+    </div>
+</div>

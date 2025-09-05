@@ -1,0 +1,34 @@
+{% extends 'dispositivos/base.html' %}
+
+{% block title %}Relatórios - Planos de Manutenção{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Dashboard de Relatórios: Planos de Manutenção</h1>
+        <a href="{% url 'dispositivos:relatorios' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left-circle"></i> Voltar ao Portal
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card p-3 h-100">
+                {% if plotly_graph_status %}
+                    {{ plotly_graph_status|safe }}
+                {% else %}
+                    <div class="alert alert-info text-center m-0">Nenhuma manutenção cadastrada para exibir o gráfico de status.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card p-3 h-100">
+                {% if plotly_graph_tipos %}
+                    {{ plotly_graph_tipos|safe }}
+                {% else %}
+                    <div class="alert alert-info text-center m-0">Não há dados para o gráfico de manutenções por tipo de dispositivo.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

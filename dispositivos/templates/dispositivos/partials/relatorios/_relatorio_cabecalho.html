@@ -1,0 +1,6 @@
+{% load static %} <div class="text-center mb-4">
+    <img src="{% static 'images/iconee_hospital.png' %}" alt="Logo" height="60">
+    <h2 class="mt-2">{{ titulo_relatorio }}</h2>
+    <p class="text-muted">Relatório gerado em {% now "d/m/Y H:i" %}</p>
+</div>
+<hr>

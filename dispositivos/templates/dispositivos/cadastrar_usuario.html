@@ -1,0 +1,15 @@
+{% extends 'dispositivos/base.html' %} {% block title %}Cadastrar Novo Usuário{% endblock %} {% block content %}
+<h1>Cadastrar Novo Usuário</h1>
+<p>Preencha os dados abaixo para criar um novo usuário no sistema.</p>
+<hr>
+
+<form method="POST" novalidate>
+    {% csrf_token %} {{ form.as_p }}
+
+    <br>
+    <div>
+        <a href="{% url 'dispositivos:lista_usuarios' %}" class="btn btn-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-primary">Salvar</button>
+    </div>
+</form>
+{% endblock %}

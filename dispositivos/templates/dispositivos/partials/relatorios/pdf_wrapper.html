@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório Customizado</title>
+    <style>
+        /* Estilos CSS simples e compatíveis com xhtml2pdf */
+        body { font-family: "Helvetica", "Arial", sans-serif; font-size: 10pt; color: #333; }
+        .header-logo { text-align: center; margin-bottom: 20px; }
+        .logo { max-width: 200px; }
+        h1, h2, h3, h4, h5, h6 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #aaa; padding: 6px; text-align: left; word-wrap: break-word; }
+        th { background-color: #f2f2f2; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header-logo">
+        <img src="{% static 'images/iconee_hospital.png' %}" class="logo">
+    </div>
+    
+    {{ conteudo_do_preview|safe }}
+    
+</body>
+</html>

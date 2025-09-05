@@ -1,0 +1,48 @@
+{% extends 'dispositivos/base.html' %}
+{% block title %}Planos de Manutenção{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Planos de Manutenção</h1>
+        <div>
+            <a href="{% url 'dispositivos:cadastrar_plano' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle-fill"></i> Cadastrar Plano
+            </a>
+        </div>
+    </div>
+
+    <div class="card p-4">
+        <h5 class="card-title mb-3">Manutenções Agendadas</h5>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover table-sm">
+                <thead>
+                    <tr>
+                        <th>Dispositivo</th>
+                        <th>Data Agendada</th>
+                        <th>Situação</th>
+                        <th>Descrição</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for plano in lista_de_planos %}
+                    <tr>
+                        <td>{{ plano.dispositivos.nome_descritivo }}</td>
+                        <td>{{ plano.data_manu|date:"d/m/Y" }}</td>
+                        <td>{{ plano.get_situacao_display }}</td> <td>{{ plano.descricao|truncatewords:20 }}</td>
+                        <td>
+                            <a href="{% url 'dispositivos:editar_plano' pk=plano.pk %}" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-pencil-fill"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">Nenhum plano de manutenção cadastrado.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

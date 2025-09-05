@@ -1,0 +1,32 @@
+{% extends 'dispositivos/base.html' %}
+
+{% block title %}Relatórios - Treinamentos{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Dashboard de Relatórios: Treinamentos</h1>
+        <a href="{% url 'dispositivos:relatorios' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left-circle"></i> Voltar ao Portal
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card text-center p-3 h-100 d-flex flex-column justify-content-center">
+                <h5 class="card-title">Tempo Médio de Duração</h5>
+                <p class="text-muted small">(Todos os Treinamentos)</p>
+                <p class="display-4 fw-bold">{{ media_duracao_treinamentos }}</p>
+            </div>
+        </div>
+
+        <div class="col-lg-8 mb-4">
+            <div class="card p-3 h-100">
+                {% if plotly_graph_por_setor %}
+                    {{ plotly_graph_por_setor|safe }}
+                {% else %}
+                    <div class="alert alert-info text-center m-0">Nenhum treinamento cadastrado para exibir o gráfico.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

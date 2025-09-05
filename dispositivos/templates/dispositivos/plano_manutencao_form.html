@@ -1,0 +1,61 @@
+{% extends 'dispositivos/base.html' %}
+
+{% block title %}{% if form.instance.pk %}Editar{% else %}Cadastrar{% endif %} Plano de Manutenção{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h1 class="h2 text-center mb-4">
+                        {% if form.instance.pk %}
+                            Editar Plano de Manutenção
+                        {% else %}
+                            Agendar Nova Manutenção
+                        {% endif %}
+                    </h1>
+                    
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.dispositivos.id_for_label }}" class="form-label">{{ form.dispositivos.label }}</label>
+                            {{ form.dispositivos }}
+                            {% for error in form.dispositivos.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.data_manu.id_for_label }}" class="form-label">{{ form.data_manu.label }}</label>
+                                {{ form.data_manu }}
+                                {% for error in form.data_manu.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.situacao.id_for_label }}" class="form-label">{{ form.situacao.label }}</label>
+                                {{ form.situacao }}
+                                {% for error in form.situacao.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.descricao.id_for_label }}" class="form-label">{{ form.descricao.label }}</label>
+                            {{ form.descricao }}
+                            {% for error in form.descricao.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+                        
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-end">
+                            <a href="{% url 'dispositivos:lista_planos' %}" class="btn btn-secondary me-2">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Salvar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

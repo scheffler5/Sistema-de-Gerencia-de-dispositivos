@@ -1,0 +1,78 @@
+{% extends 'dispositivos/base.html' %}
+
+{% block title %}Relatórios - Computadores{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Dashboard de Relatórios: Computadores</h1>
+        <a href="{% url 'dispositivos:relatorios' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left-circle"></i> Voltar ao Portal
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3 mb-4">
+            <div class="card text-center p-3 h-100 d-flex flex-column justify-content-center">
+                <h5 class="card-title">Total de Computadores</h5>
+                <p class="display-4 fw-bold">{{ total_computadores }}</p>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+            <div class="card p-3 h-100">
+                {% if plotly_graph_ativos %}
+                    {{ plotly_graph_ativos|safe }}
+                {% else %}
+                    <div class="alert alert-info text-center m-0">Nenhum computador cadastrado para exibir o gráfico.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-5 mb-4">
+            <div class="card p-3 h-100">
+                {% if plotly_graph_por_setor %}
+                    {{ plotly_graph_por_setor|safe }}
+                {% else %}
+                    <div class="alert alert-info text-center m-0">Não há dados para o gráfico de computadores por setor.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+     <div class="card p-4">
+        <p class="text-muted">Esta tabela analisa múltiplos fatores (idade, hardware, histórico de chamados) para gerar uma pontuação de saúde para cada dispositivo. Pontuações baixas indicam equipamentos que podem precisar de substituição ou upgrade.</p>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover table-sm">
+                <thead>
+                    <tr>
+                        <th>Nome do Dispositivo</th>
+                        <th>Setor</th>
+                        <th>Endereço IP</th>
+                        <th class="text-center">Pontuação de Saúde / Depreciação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in dados_depreciacao %}
+                    <tr>
+                        <td>{{ item.computador.nome }}</td>
+                        <td>{{ item.computador.setor.nome }}</td>
+                        <td>{{ item.computador.ip_dispositivo }}</td>
+                        <td class="text-center">
+                            {% if item.score < 40 %}
+                                <span class="badge bg-danger fs-6">{{ item.score }}% (Crítico)</span>
+                            {% elif item.score < 70 %}
+                                <span class="badge bg-warning text-dark fs-6">{{ item.score }}% (Atenção)</span>
+                            {% else %}
+                                <span class="badge bg-success fs-6">{{ item.score }}% (Bom)</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">Nenhum computador encontrado para análise.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends 'dispositivos/base.html' %}
+
+{% block title %}Relatórios - Chamados{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Dashboard de Relatórios: Chamados</h1>
+        <a href="{% url 'dispositivos:relatorios' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left-circle"></i> Voltar ao Portal de Relatórios
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card p-3 h-100">
+                {% if graph_chamados_por_setor %}
+                    {{ graph_chamados_por_setor|safe }}
+                {% else %}
+                    <div class="alert alert-info text-center m-0">Sem dados para o gráfico de Chamados por Setor.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+            <div class="card p-3 h-100">
+                {% if graph_chamados_por_status %}
+                    {{ graph_chamados_por_status|safe }}
+                {% else %}
+                    <div class="alert alert-info text-center m-0">Sem dados para o gráfico de Chamados por Status.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        
+        <div class="col-lg-4 mb-4">
+            <div class="card p-3 h-100 text-center d-flex flex-column justify-content-center">
+                <h5 class="card-title">Tempo Médio de Atendimento</h5>
+                <p class="text-muted small">(Mês Atual)</p>
+                <div class="display-4 fw-bold my-3">
+                    {{ tempo_medio_chamados }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">  
+
+    <div class="col-lg-4 mb-4">
+            <div class="card p-3 h-100">
+                {% if graph_qualidade_servico %}
+                    {{ graph_qualidade_servico|safe }}
+                {% else %}
+                    <div class="alert alert-info text-center m-0">Sem dados para o gráfico de Qualidade.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+            <div class="card p-3 h-100 text-center d-flex flex-column justify-content-center">
+                <h5 class="card-title">Manutenções no Mês</h5>
+                <p class="display-4 fw-bold">{{ contagem_manutencoes_mes }}</p>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mb-4">
+            <div class="card p-3 h-100 text-center d-flex flex-column justify-content-center">
+                <h5 class="card-title">Ajustes no Mês</h5>
+                <p class="display-4 fw-bold">{{ contagem_ajustes_mes }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-lg-12">
+            <div class="card p-3">
+                {% if graph_top_dispositivos %}
+                    {{ graph_top_dispositivos|safe }}
+                {% else %}
+                    <div class="alert alert-info text-center m-0">Sem dados para o gráfico de Top Dispositivos.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
